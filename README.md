@@ -1,2 +1,2 @@
 # CastleDungeon
-Python version of a classic commodore 64 game.
+Python version of a classic Commodore 64 game.
