@@ -9,13 +9,13 @@ import pygame
 import GameState
 from Paint import paint
 from MakeMaze import make_maze
-from GameLogic import fill_maze, check_move
+from GameLogic import fill_maze, check_move, move_monsters
 
 pygame.joystick.init()
 joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
 
 # 2 Second timer event
-pygame.time.set_timer(pygame.USEREVENT, 2000)
+pygame.time.set_timer(pygame.USEREVENT, 1000)
 
 make_maze()
 fill_maze()
@@ -25,7 +25,6 @@ while True:
 
     # Get all pygame events
     for event in pygame.event.get():
-        # print(event)
         match event.type:
 
             # Exit if window is closed
@@ -33,7 +32,7 @@ while True:
                 sys.exit()
 
             case pygame.USEREVENT:
-                print('Timer Event')
+                move_monsters()
 
             case pygame.KEYDOWN if event.key == pygame.K_F1:
                 make_maze()

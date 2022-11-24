@@ -14,7 +14,7 @@ IMAGE_HEIGHT = (GameState.MAZE_HEIGHT * CELL_HEIGHT) + 8
 
 pygame.init()
 screen = pygame.display.set_mode((IMAGE_WIDTH, IMAGE_HEIGHT))
-pygame.display.set_caption('Castle Dungeon   V1.0')
+pygame.display.set_caption('Castle Dungeon   V1.1')
 
 img_door = pygame.image.load("Bitmaps/Door.png")
 img_bottom_edge = pygame.image.load("Bitmaps/BottomEdge.png")
@@ -47,7 +47,6 @@ def paint():
     # Paint the prisoner
     x = (GameState.pris_x * CELL_WIDTH) + 8
     y = (GameState.pris_y * CELL_HEIGHT) + 8
-
     match [GameState.sword_count, GameState.rope_count]:
         case [0, 0]: screen.blit(img_prisoner, (x, y))
         case [0, _]: screen.blit(img_prisoner_r, (x, y))

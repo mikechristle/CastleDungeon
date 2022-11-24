@@ -17,6 +17,8 @@ roar = mixer.Sound('Sounds/Roar.wav')
 tada = mixer.Sound('Sounds/TaDa.wav')
 whoop = mixer.Sound('Sounds/Whoop.wav')
 
+monsters = []
+
 
 # ---------------------------------------------------------------------------
 def check_move(key):
@@ -65,6 +67,45 @@ def check_move(key):
 
 
 # ---------------------------------------------------------------------------
+def move_monsters():
+
+    for _ in range(len(monsters)):
+        x0, y0 = monsters.pop(0)
+        cell0 = GameState.maze[y0][x0]
+        if cell0.con != Cell.MONSTER:
+            continue
+
+        x1, y1 = x0, y0
+        match random.randrange(0, 4):
+            case 0 if cell0.top: y1 -= 1
+            case 1 if cell0.rit: x1 += 1
+            case 2 if cell0.bot: y1 += 1
+            case 3 if cell0.lft: x1 -= 1
+            case _:
+                monsters.append((x0, y0))
+                continue
+
+        if x1 == GameState.pris_x and y1 == GameState.pris_y:
+            if GameState.sword_count > 0:
+                GameState.sword_count -= 1
+                cell0.con = Cell.NONE
+                fight.play()
+                continue
+            else:
+                GameState.game_done = True
+                tada.play()
+                return
+
+        cell1 = GameState.maze[y1][x1]
+        if cell1.con == Cell.NONE:
+            cell1.con = Cell.MONSTER
+            cell0.con = Cell.NONE
+            monsters.append((x1, y1))
+        else:
+            monsters.append((x0, y0))
+
+
+# ---------------------------------------------------------------------------
 def fill_maze():
 
     # Reset game
@@ -83,7 +124,7 @@ def fill_maze():
             cell.con = Cell.COIN
             count -= 1
 
-    # Add monsters to the maze
+    # Add swords to the maze
     count = GameState.SWORDS
     while count > 0:
         x = random.randrange(0, GameState.MAZE_WIDTH)
@@ -94,6 +135,7 @@ def fill_maze():
             count -= 1
 
     # Add monsters to the maze
+    monsters.clear()
     count = GameState.SWORDS
     while count > 0:
         x = random.randrange(0, GameState.MAZE_WIDTH)
@@ -102,6 +144,7 @@ def fill_maze():
         if cell.con == Cell.NONE:
             cell.con = Cell.MONSTER
             count -= 1
+            monsters.append((x, y))
 
     # Add ropes to the maze
     count = GameState.ROPES
