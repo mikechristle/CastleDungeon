@@ -14,7 +14,7 @@ IMAGE_HEIGHT = (GameState.MAZE_HEIGHT * CELL_HEIGHT) + 8
 
 pygame.init()
 screen = pygame.display.set_mode((IMAGE_WIDTH, IMAGE_HEIGHT))
-pygame.display.set_caption('Castle Dungeon   V1.1')
+pygame.display.set_caption('Castle Dungeon   V1.2')
 
 img_door = pygame.image.load("Bitmaps/Door.png")
 img_bottom_edge = pygame.image.load("Bitmaps/BottomEdge.png")
