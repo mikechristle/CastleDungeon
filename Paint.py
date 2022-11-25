@@ -38,11 +38,11 @@ img_wall_side = pygame.image.load("Bitmaps/WallSide.png")
 
 # ---------------------------------------------------------------------------
 def paint():
-    if GameState.game_done:
-        paint_all()
-    else:
+    if GameState.game_active:
         screen.fill((0, 0, 0))
         paint_local(GameState.pris_x, GameState.pris_y, 0)
+    else:
+        paint_all()
 
     # Paint the prisoner
     x = (GameState.pris_x * CELL_WIDTH) + 8
@@ -125,3 +125,43 @@ def paint_cell(x, y):
         case Cell.ROPE: screen.blit(img_rope, (x, y))
         case Cell.MONSTER: screen.blit(img_monster, (x, y))
         case Cell.SWORD: screen.blit(img_sword, (x, y))
+
+
+# ---------------------------------------------------------------------------
+def paint_intro():
+    intro = (
+        'You are a prisoner trapped in a dungeon!',
+        'To escape you must find the green door.',
+        'However, there are no lights, but you have a small',
+        'lantern so you can see a little around yourself.',
+        'Beware, there are monsters that will eat your bones.',
+        'You can kill a monster if you have a sword, but each sword',
+        'will only kill one monster because their blood is acid.',
+        'Watch your step, so you don\'t fall into a bottomless pit.',
+        'You can cross a bottomless pit if you have a rope.',
+        'The rope will get tangled up in the rocks,',
+        ' so it is only good for one bottomless pit.',
+        'Keep a lookout for gold coins. Each coin is worth $100.',
+        'You have three minutes to escape before the alarm goes',
+        'off and you are captured.',
+        '',
+        'Use arrow keys to move prisoner.',
+        'Press N for new game, X to exit.',
+    )
+    font = pygame.font.SysFont('Arial Bold', 72)
+    text = font.render('Castle Dungeon', True, (255, 0, 0))
+    rect = text.get_rect()
+    rect.center = (IMAGE_WIDTH // 2, 40)
+    screen.blit(text, rect)
+
+    y = 100
+    font = pygame.font.SysFont('Arial Bold', 48)
+    for line in intro:
+        text = font.render(line, True, (255, 0, 0))
+        rect = text.get_rect()
+        rect.center = (IMAGE_WIDTH // 2, y)
+        screen.blit(text, rect)
+        y += 40
+
+    pygame.display.update()
+

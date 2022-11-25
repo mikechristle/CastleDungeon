@@ -7,7 +7,7 @@ import sys
 import pygame
 
 import GameState
-from Paint import paint
+from Paint import paint, paint_intro
 from MakeMaze import make_maze
 from GameLogic import fill_maze, check_move, move_monsters
 
@@ -17,9 +17,7 @@ joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_coun
 # 2 Second timer event
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
-make_maze()
-fill_maze()
-paint()
+paint_intro()
 
 while True:
 
@@ -31,33 +29,18 @@ while True:
             case pygame.QUIT:
                 sys.exit()
 
-            case pygame.USEREVENT:
+            case pygame.KEYDOWN if event.key == pygame.K_x:
+                sys.exit()
+
+            case pygame.KEYDOWN if event.key == pygame.K_n:
+                make_maze()
+                fill_maze()
+                paint()
+
+            case pygame.USEREVENT if GameState.game_active:
                 move_monsters()
+                paint()
 
-            case pygame.KEYDOWN if event.key == pygame.K_F1:
-                make_maze()
-                fill_maze()
-
-            case pygame.KEYDOWN if not GameState.game_done:
+            case pygame.KEYDOWN if GameState.game_active:
                 check_move(event.key)
-
-            case pygame.JOYAXISMOTION if not GameState.game_done:
-                value = int(event.value)
-                match [event.axis, value]:
-                    case [0,  1]: check_move(pygame.K_RIGHT)
-                    case [0, -1]: check_move(pygame.K_LEFT)
-                    case [4,  1]: check_move(pygame.K_DOWN)
-                    case [4, -1]: check_move(pygame.K_UP)
-
-            case pygame.JOYBUTTONDOWN if event.button == 9:
-                make_maze()
-                fill_maze()
-
-            case pygame.JOYBUTTONDOWN if not GameState.game_done:
-                match event.button:
-                    case 0: check_move(pygame.K_UP)
-                    case 1: check_move(pygame.K_RIGHT)
-                    case 2: check_move(pygame.K_DOWN)
-                    case 3: check_move(pygame.K_LEFT)
-
-        paint()
+                paint()

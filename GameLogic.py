@@ -16,6 +16,7 @@ fight = mixer.Sound('Sounds/Fight.wav')
 roar = mixer.Sound('Sounds/Roar.wav')
 tada = mixer.Sound('Sounds/TaDa.wav')
 whoop = mixer.Sound('Sounds/Whoop.wav')
+alarm = mixer.Sound('Sounds/Alarm.wav')
 
 monsters = []
 
@@ -52,22 +53,28 @@ def check_move(key):
             cell.con = Cell.NONE
             fight.play()
         case Cell.MONSTER if GameState.sword_count == 0:
-            GameState.game_done = True
+            GameState.game_active = False
             roar.play()
         case Cell.PIT if GameState.rope_count > 0:
             GameState.rope_count -= 1
             cell.con = Cell.NONE
             whoop.play()
         case Cell.PIT if GameState.rope_count == 0:
-            GameState.game_done = True
+            GameState.game_active = False
             fall.play()
         case Cell.DOOR:
-            GameState.game_done = True
+            GameState.game_active = False
             tada.play()
 
 
 # ---------------------------------------------------------------------------
 def move_monsters():
+
+    GameState.timeout_counter -= 1
+    if GameState.timeout_counter == 0:
+        GameState.game_active = False
+        alarm.play()
+        return
 
     for _ in range(len(monsters)):
         x0, y0 = monsters.pop(0)
@@ -92,8 +99,8 @@ def move_monsters():
                 fight.play()
                 continue
             else:
-                GameState.game_done = True
-                tada.play()
+                GameState.game_active = False
+                roar.play()
                 return
 
         cell1 = GameState.maze[y1][x1]
@@ -112,7 +119,8 @@ def fill_maze():
     GameState.coin_count = 0
     GameState.sword_count = 0
     GameState.rope_count = 0
-    GameState.game_done = False
+    GameState.game_active = True
+    GameState.timeout_counter = 180
 
     # Add coins to the maze
     count = GameState.COINS

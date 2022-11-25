@@ -21,4 +21,5 @@ coin_count = 0
 sword_count = 0
 rope_count = 0
 
-game_done = False
+game_active = False
+timeout_counter = 0
