@@ -5,7 +5,7 @@
 
 from Cell import Cell
 
-MAZE_WIDTH = 25
+MAZE_WIDTH = 22
 MAZE_HEIGHT = 18
 
 COINS = 10  # Number of coins

@@ -12,12 +12,21 @@ PAD = 8
 IMAGE_WIDTH = (GameState.MAZE_WIDTH * CELL_SIZE) + PAD
 IMAGE_HEIGHT = (GameState.MAZE_HEIGHT * CELL_SIZE) + PAD
 
-BLACK = (0, 0, 0)
+COIN_OFFSET = PAD + (CELL_SIZE * 2)
+SWORD_OFFSET = COIN_OFFSET + (CELL_SIZE * GameState.COINS)
+ROPE_OFFSET = SWORD_OFFSET + (CELL_SIZE * GameState.SWORDS)
+
 RED = (255, 0, 0)
+WHITE = (255, 255, 255)
+GRAY = (48, 48, 48)
 
 pygame.init()
-screen = pygame.display.set_mode((IMAGE_WIDTH, IMAGE_HEIGHT))
+screen = pygame.display.set_mode((IMAGE_WIDTH, IMAGE_HEIGHT + CELL_SIZE))
 pygame.display.set_caption('Castle Dungeon   V1.2')
+
+STATUS_FONT = pygame.font.SysFont('Arial', 36)
+HEADER_FONT = pygame.font.SysFont('Arial Bold', 72)
+INFO_FONT = pygame.font.SysFont('Arial Bold', 48)
 
 img_door = pygame.image.load("Bitmaps/Door.png")
 img_bottom_edge = pygame.image.load("Bitmaps/BottomEdge.png")
@@ -41,11 +50,12 @@ img_wall_side = pygame.image.load("Bitmaps/WallSide.png")
 
 # ---------------------------------------------------------------------------
 def paint():
+    screen.fill(GRAY)
     if GameState.game_active:
-        screen.fill(BLACK)
         paint_local(GameState.pris_x, GameState.pris_y, 0)
     else:
         paint_all()
+    paint_status()
 
     # Paint the prisoner
     x = (GameState.pris_x * CELL_SIZE) + PAD
@@ -57,6 +67,33 @@ def paint():
         case [_, _]: screen.blit(img_prisoner_rs, (x, y))
 
     pygame.display.flip()
+
+
+# ---------------------------------------------------------------------------
+def paint_status():
+    text = STATUS_FONT.render(f'${GameState.coin_count * 100}', True, WHITE)
+    rect = text.get_rect()
+    rect.top = IMAGE_HEIGHT
+    rect.left = PAD
+    screen.blit(text, rect)
+
+    y = IMAGE_HEIGHT
+    x = COIN_OFFSET
+    for _ in range(GameState.coin_count):
+        screen.blit(img_coin, (x, y))
+        x += CELL_SIZE
+
+    x = SWORD_OFFSET
+    for _ in range(GameState.sword_count):
+        screen.blit(img_sword, (x, y))
+        x += CELL_SIZE
+        print('Sword', x)
+
+    x = ROPE_OFFSET
+    for _ in range(GameState.rope_count):
+        screen.blit(img_rope, (x, y))
+        x += CELL_SIZE
+        print('Rope', x)
 
 
 # ---------------------------------------------------------------------------
@@ -151,16 +188,14 @@ def paint_intro():
         'Use arrow keys to move prisoner.',
         'Press N for new game, X to exit.',
     )
-    font = pygame.font.SysFont('Arial Bold', 72)
-    text = font.render('Castle Dungeon', True, RED)
+    text = HEADER_FONT.render('Castle Dungeon', True, RED)
     rect = text.get_rect()
     rect.center = (IMAGE_WIDTH // 2, 40)
     screen.blit(text, rect)
 
-    y = 100
-    font = pygame.font.SysFont('Arial Bold', 48)
+    y = 120
     for line in intro:
-        text = font.render(line, True, RED)
+        text = INFO_FONT.render(line, True, RED)
         rect = text.get_rect()
         rect.center = (IMAGE_WIDTH // 2, y)
         screen.blit(text, rect)
