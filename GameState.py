@@ -5,8 +5,8 @@
 
 from Cell import Cell
 
-MAZE_WIDTH = 21
-MAZE_HEIGHT = 17
+MAZE_WIDTH = 25
+MAZE_HEIGHT = 18
 
 COINS = 10  # Number of coins
 SWORDS = 4  # Number of monsters and swords

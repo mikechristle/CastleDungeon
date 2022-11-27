@@ -7,10 +7,13 @@ import GameState
 import pygame
 from Cell import Cell
 
-CELL_WIDTH = 48
-CELL_HEIGHT = 48
-IMAGE_WIDTH = (GameState.MAZE_WIDTH * CELL_WIDTH) + 8
-IMAGE_HEIGHT = (GameState.MAZE_HEIGHT * CELL_HEIGHT) + 8
+CELL_SIZE = 48
+PAD = 8
+IMAGE_WIDTH = (GameState.MAZE_WIDTH * CELL_SIZE) + PAD
+IMAGE_HEIGHT = (GameState.MAZE_HEIGHT * CELL_SIZE) + PAD
+
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
 
 pygame.init()
 screen = pygame.display.set_mode((IMAGE_WIDTH, IMAGE_HEIGHT))
@@ -39,14 +42,14 @@ img_wall_side = pygame.image.load("Bitmaps/WallSide.png")
 # ---------------------------------------------------------------------------
 def paint():
     if GameState.game_active:
-        screen.fill((0, 0, 0))
+        screen.fill(BLACK)
         paint_local(GameState.pris_x, GameState.pris_y, 0)
     else:
         paint_all()
 
     # Paint the prisoner
-    x = (GameState.pris_x * CELL_WIDTH) + 8
-    y = (GameState.pris_y * CELL_HEIGHT) + 8
+    x = (GameState.pris_x * CELL_SIZE) + PAD
+    y = (GameState.pris_y * CELL_SIZE) + PAD
     match [GameState.sword_count, GameState.rope_count]:
         case [0, 0]: screen.blit(img_prisoner, (x, y))
         case [0, _]: screen.blit(img_prisoner_r, (x, y))
@@ -65,20 +68,20 @@ def paint_all():
             paint_cell(x, y)
 
     # Paint right side walls
-    x = GameState.MAZE_WIDTH * CELL_WIDTH
+    x = GameState.MAZE_WIDTH * CELL_SIZE
     for y in range(GameState.MAZE_HEIGHT):
-        y *= CELL_HEIGHT
+        y *= CELL_SIZE
         screen.blit(img_right_edge, (x, y))
 
     # Paint bottom side walls
-    y = GameState.MAZE_HEIGHT * CELL_HEIGHT
+    y = GameState.MAZE_HEIGHT * CELL_SIZE
     for x in range(GameState.MAZE_WIDTH):
-        x *= CELL_WIDTH
+        x *= CELL_SIZE
         screen.blit(img_bottom_edge, (x, y))
 
     # Paint bottom right corner
-    x = GameState.MAZE_WIDTH * CELL_WIDTH
-    y = GameState.MAZE_HEIGHT * CELL_HEIGHT
+    x = GameState.MAZE_WIDTH * CELL_SIZE
+    y = GameState.MAZE_HEIGHT * CELL_SIZE
     screen.blit(img_cell, (x, y))
 
 
@@ -96,18 +99,18 @@ def paint_local(x, y, depth):
     if cell.bot:
         paint_local(x, y + 1, depth + 1)
     else:
-        screen.blit(img_bottom_edge, (x * CELL_WIDTH, (y + 1) * CELL_HEIGHT))
+        screen.blit(img_bottom_edge, (x * CELL_SIZE, (y + 1) * CELL_SIZE))
     if cell.rit:
         paint_local(x + 1, y, depth + 1)
     else:
-        screen.blit(img_right_edge, ((x + 1) * CELL_WIDTH, y * CELL_HEIGHT))
+        screen.blit(img_right_edge, ((x + 1) * CELL_SIZE, y * CELL_SIZE))
 
 
 # ---------------------------------------------------------------------------
 def paint_cell(x, y):
     cell = GameState.maze[y][x]
-    x *= CELL_WIDTH
-    y *= CELL_HEIGHT
+    x *= CELL_SIZE
+    y *= CELL_SIZE
 
     match [cell.lft, cell.top]:
         case [False, False]: img = img_cell_lt
@@ -116,8 +119,8 @@ def paint_cell(x, y):
         case [True, True]:   img = img_cell
     screen.blit(img, (x, y))
 
-    x += 8
-    y += 8
+    x += PAD
+    y += PAD
     match cell.con:
         case Cell.DOOR: screen.blit(img_door, (x, y))
         case Cell.COIN: screen.blit(img_coin, (x, y))
@@ -149,7 +152,7 @@ def paint_intro():
         'Press N for new game, X to exit.',
     )
     font = pygame.font.SysFont('Arial Bold', 72)
-    text = font.render('Castle Dungeon', True, (255, 0, 0))
+    text = font.render('Castle Dungeon', True, RED)
     rect = text.get_rect()
     rect.center = (IMAGE_WIDTH // 2, 40)
     screen.blit(text, rect)
@@ -157,7 +160,7 @@ def paint_intro():
     y = 100
     font = pygame.font.SysFont('Arial Bold', 48)
     for line in intro:
-        text = font.render(line, True, (255, 0, 0))
+        text = font.render(line, True, RED)
         rect = text.get_rect()
         rect.center = (IMAGE_WIDTH // 2, y)
         screen.blit(text, rect)
