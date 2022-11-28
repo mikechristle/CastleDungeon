@@ -9,6 +9,7 @@ import GameState
 from Cell import Cell
 from pygame import mixer
 
+pygame.mixer.init()
 slap = mixer.Sound('Sounds/Slap.wav')
 ding = mixer.Sound('Sounds/Ding.wav')
 fall = mixer.Sound('Sounds/Fall.wav')
@@ -25,17 +26,23 @@ slap_key = pygame.K_SPACE
 
 # ---------------------------------------------------------------------------
 def check_slap(key):
+    """If the same wall is slapped 5 times, remove the wall."""
     global slap_key, slap_count
 
+    # If first slap
     if slap_key != key:
         slap_key = key
         slap_count = 4
     else:
         slap_count -= 1
+
+        # If fifth slap
         if slap_count == 0:
             slap_key = pygame.K_SPACE
             x = GameState.pris_x
             y = GameState.pris_y
+
+            # Which wall to remove
             match key:
                 case pygame.K_RIGHT:
                     GameState.maze[y][x].rit = True
@@ -53,8 +60,11 @@ def check_slap(key):
 
 # ---------------------------------------------------------------------------
 def check_move(key):
+    """Check the key and move the prisoner."""
+
     global slap_key
 
+    # Check for valid moves
     cell = GameState.maze[GameState.pris_y][GameState.pris_x]
     match key:
         case pygame.K_RIGHT if cell.rit: GameState.pris_x += 1
@@ -62,10 +72,12 @@ def check_move(key):
         case pygame.K_UP    if cell.top: GameState.pris_y -= 1
         case pygame.K_DOWN  if cell.bot: GameState.pris_y += 1
         case _:
+            # If not a valid move, slap the wall
             slap.play()
             check_slap(key)
             return
 
+    # Check the new cell for rewords and hazards
     slap_key = pygame.K_SPACE
     cell = GameState.maze[GameState.pris_y][GameState.pris_x]
     match cell.con:
@@ -102,19 +114,28 @@ def check_move(key):
 
 # ---------------------------------------------------------------------------
 def move_monsters():
+    """
+    Randomly move the monsters once a second.
+    Check tree minute alarm timer.
+    """
 
+    # If alarm timer has expired, sound alarm and end game.
     GameState.timeout_counter -= 1
     if GameState.timeout_counter == 0:
         GameState.game_active = False
         alarm.play()
         return
 
+    # For each active monster
     for _ in range(len(monsters)):
         x0, y0 = monsters.pop(0)
         cell0 = GameState.maze[y0][x0]
+
+        # If cell is empty then monster was slain
         if cell0.con != Cell.MONSTER:
             continue
 
+        # Attempt to move monster in a random direction
         x1, y1 = x0, y0
         match random.randrange(0, 4):
             case 0 if cell0.top: y1 -= 1
@@ -122,20 +143,27 @@ def move_monsters():
             case 2 if cell0.bot: y1 += 1
             case 3 if cell0.lft: x1 -= 1
             case _:
+                # If blocked by a wall, leave it where it is
                 monsters.append((x0, y0))
                 continue
 
+        # If prisoner is in new cell
         if x1 == GameState.pris_x and y1 == GameState.pris_y:
+
+            # If prisoner has a sword, slay the monster
             if GameState.sword_count > 0:
                 GameState.sword_count -= 1
                 cell0.con = Cell.NONE
                 fight.play()
                 continue
+
+            # Else prisoner dies and the game ends
             else:
                 GameState.game_active = False
                 roar.play()
                 return
 
+        # Move the monster to the new cell
         cell1 = GameState.maze[y1][x1]
         if cell1.con == Cell.NONE:
             cell1.con = Cell.MONSTER
@@ -147,6 +175,7 @@ def move_monsters():
 
 # ---------------------------------------------------------------------------
 def fill_maze():
+    """Fill a new maze with rewords, hazards and a prisoner."""
 
     # Reset game
     GameState.coin_count = 0

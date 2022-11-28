@@ -3,6 +3,8 @@
 # Mike Christle 2022
 # ---------------------------------------------------------------------------
 class Cell:
+
+    # Possible contents for a maze cell
     NONE = 0
     DOOR = 1
     COIN = 2

@@ -11,12 +11,12 @@ from Paint import paint, paint_intro
 from MakeMaze import make_maze
 from GameLogic import fill_maze, check_move, move_monsters
 
-pygame.joystick.init()
-joysticks = [pygame.joystick.Joystick(x) for x in range(pygame.joystick.get_count())]
+MOVE_KEYS = (pygame.K_UP, pygame.K_DOWN, pygame.K_RIGHT, pygame.K_LEFT)
 
-# 2 Second timer event
+# 1 Second timer event
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
+# Display the instruction screen
 paint_intro()
 
 while True:
@@ -29,18 +29,23 @@ while True:
             case pygame.QUIT:
                 sys.exit()
 
+            # Exit is x key is pressed
             case pygame.KEYDOWN if event.key == pygame.K_x:
                 sys.exit()
 
+            # Start a new game if n key os pressed
             case pygame.KEYDOWN if event.key == pygame.K_n:
                 make_maze()
                 fill_maze()
                 paint()
 
+            # If game is active, move monsters each second
             case pygame.USEREVENT if GameState.game_active:
                 move_monsters()
                 paint()
 
+            # if game is active, check keyboard inputs
             case pygame.KEYDOWN if GameState.game_active:
-                check_move(event.key)
-                paint()
+                if event.key in MOVE_KEYS:
+                    check_move(event.key)
+                    paint()

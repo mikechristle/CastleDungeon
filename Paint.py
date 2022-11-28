@@ -7,8 +7,10 @@ import GameState
 import pygame
 from Cell import Cell
 
+# Do not change these parameters, they match the size of the .PNG files
 CELL_SIZE = 48
 PAD = 8
+
 IMAGE_WIDTH = (GameState.MAZE_WIDTH * CELL_SIZE) + PAD
 IMAGE_HEIGHT = (GameState.MAZE_HEIGHT * CELL_SIZE) + PAD
 
@@ -50,11 +52,20 @@ img_wall_side = pygame.image.load("Bitmaps/WallSide.png")
 
 # ---------------------------------------------------------------------------
 def paint():
+    """Paint the screen."""
+
+    # Clear the previous screen
     screen.fill(GRAY)
+
+    # if the game is active, only paint the area around the prisoner
     if GameState.game_active:
         paint_local(GameState.pris_x, GameState.pris_y, 0)
+
+    # Else paint the entire maze
     else:
         paint_all()
+
+    # Paint the status bar at the bottom
     paint_status()
 
     # Paint the prisoner
@@ -71,33 +82,38 @@ def paint():
 
 # ---------------------------------------------------------------------------
 def paint_status():
+    """Paint the status bar."""
+
+    # Paint the dollar amount of coins
     text = STATUS_FONT.render(f'${GameState.coin_count * 100}', True, WHITE)
     rect = text.get_rect()
     rect.top = IMAGE_HEIGHT
     rect.left = PAD
     screen.blit(text, rect)
 
+    # Paint the coins
     y = IMAGE_HEIGHT
     x = COIN_OFFSET
     for _ in range(GameState.coin_count):
         screen.blit(img_coin, (x, y))
         x += CELL_SIZE
 
+    # Paint the swords
     x = SWORD_OFFSET
     for _ in range(GameState.sword_count):
         screen.blit(img_sword, (x, y))
         x += CELL_SIZE
-        print('Sword', x)
 
+    # Paint the ropes
     x = ROPE_OFFSET
     for _ in range(GameState.rope_count):
         screen.blit(img_rope, (x, y))
         x += CELL_SIZE
-        print('Rope', x)
 
 
 # ---------------------------------------------------------------------------
 def paint_all():
+    """Paint the entire maze."""
 
     # Paint cells
     for y in range(GameState.MAZE_HEIGHT):
@@ -124,10 +140,16 @@ def paint_all():
 
 # ---------------------------------------------------------------------------
 def paint_local(x, y, depth):
+    """Paint cell around the prisoner."""
+
+    # Only paint cells that are one or two cells away from prisoner
     if depth > 2:
         return
 
+    # Paint the current cell
     paint_cell(x, y)
+
+    # Paint the neighboring cells
     cell = GameState.maze[y][x]
     if cell.top:
         paint_local(x, y - 1, depth + 1)
@@ -145,10 +167,16 @@ def paint_local(x, y, depth):
 
 # ---------------------------------------------------------------------------
 def paint_cell(x, y):
+    """Paint a cell."""
+
+    # Get the cell
     cell = GameState.maze[y][x]
+
+    # Screen coordinates of the cell
     x *= CELL_SIZE
     y *= CELL_SIZE
 
+    # Paint the blank cell image with optional left the top walls
     match [cell.lft, cell.top]:
         case [False, False]: img = img_cell_lt
         case [False, True]:  img = img_cell_l
@@ -156,6 +184,7 @@ def paint_cell(x, y):
         case [True, True]:   img = img_cell
     screen.blit(img, (x, y))
 
+    # Paint any contents of the cell
     x += PAD
     y += PAD
     match cell.con:
@@ -169,6 +198,8 @@ def paint_cell(x, y):
 
 # ---------------------------------------------------------------------------
 def paint_intro():
+    """Paint the intro text screen."""
+
     intro = (
         'You are a prisoner trapped in a dungeon!',
         'To escape you must find the green door.',
@@ -188,11 +219,14 @@ def paint_intro():
         'Use arrow keys to move prisoner.',
         'Press N for new game, X to exit.',
     )
+
+    # Paint the game title
     text = HEADER_FONT.render('Castle Dungeon', True, RED)
     rect = text.get_rect()
     rect.center = (IMAGE_WIDTH // 2, 40)
     screen.blit(text, rect)
 
+    # Paint each line ot intro text
     y = 120
     for line in intro:
         text = INFO_FONT.render(line, True, RED)
