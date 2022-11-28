@@ -19,12 +19,43 @@ whoop = mixer.Sound('Sounds/Whoop.wav')
 alarm = mixer.Sound('Sounds/Alarm.wav')
 
 monsters = []
+slap_count = 0
+slap_key = pygame.K_SPACE
+
+
+# ---------------------------------------------------------------------------
+def check_slap(key):
+    global slap_key, slap_count
+
+    if slap_key != key:
+        slap_key = key
+        slap_count = 4
+    else:
+        slap_count -= 1
+        if slap_count == 0:
+            slap_key = pygame.K_SPACE
+            x = GameState.pris_x
+            y = GameState.pris_y
+            match key:
+                case pygame.K_RIGHT:
+                    GameState.maze[y][x].rit = True
+                    GameState.maze[y][x + 1].lft = True
+                case pygame.K_LEFT:
+                    GameState.maze[y][x].lft = True
+                    GameState.maze[y][x - 1].rit = True
+                case pygame.K_UP:
+                    GameState.maze[y][x].top = True
+                    GameState.maze[y - 1][x].bot = True
+                case pygame.K_DOWN:
+                    GameState.maze[y][x].bot = True
+                    GameState.maze[y + 1][x].top = True
 
 
 # ---------------------------------------------------------------------------
 def check_move(key):
-    cell = GameState.maze[GameState.pris_y][GameState.pris_x]
+    global slap_key
 
+    cell = GameState.maze[GameState.pris_y][GameState.pris_x]
     match key:
         case pygame.K_RIGHT if cell.rit: GameState.pris_x += 1
         case pygame.K_LEFT  if cell.lft: GameState.pris_x -= 1
@@ -32,8 +63,10 @@ def check_move(key):
         case pygame.K_DOWN  if cell.bot: GameState.pris_y += 1
         case _:
             slap.play()
+            check_slap(key)
             return
 
+    slap_key = pygame.K_SPACE
     cell = GameState.maze[GameState.pris_y][GameState.pris_x]
     match cell.con:
         case Cell.COIN:
@@ -192,4 +225,3 @@ def fill_maze():
             GameState.pris_x = x
             GameState.pris_y = y
             break
-
