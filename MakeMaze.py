@@ -108,7 +108,6 @@ def make_maze():
         # Done when there are no more border cells
         cnt = len(border_cells)
         if cnt == 0:
-            print('No more border cells')
             break
 
         # Pick a random border cell
@@ -119,7 +118,6 @@ def make_maze():
 
         # If there are no neighbors, the maze os complete
         if len(n) == 0:
-            print('No more neighbors')
             break
 
         # Pick a random neighbor cell
